@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Poultry Farm Manager</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
@@ -14,6 +15,10 @@
   .logo-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
   .logo-sub { font-size: 12px; color: #666; }
   .today-label { font-size: 13px; color: #666; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 6px 12px; }
+  .db-status { font-size: 12px; padding: 4px 10px; border-radius: 99px; font-weight: 500; }
+  .db-status.connected { background: #C0DD97; color: #27500A; }
+  .db-status.disconnected { background: #f7c1c1; color: #791F1F; }
+  .db-status.loading { background: #f0f0f0; color: #888; }
   .farm-switcher { display: flex; gap: 0; margin-bottom: 1.5rem; border: 1.5px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fff; }
   .farm-tab { flex: 1; padding: 14px 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; background: none; color: #888; transition: all 0.15s; text-align: center; border-right: 1.5px solid #e0e0e0; }
   .farm-tab:last-child { border-right: none; }
@@ -49,6 +54,7 @@
   .divider { border: none; border-top: 1px solid #f0f0f0; margin: 1.25rem 0; }
   .btn-primary { background: #3B6D11; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-primary:hover { background: #27500A; }
+  .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
   .btn-secondary { background: #fff; color: #333; border: 1px solid #ddd; border-radius: 8px; padding: 10px 18px; font-size: 14px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-secondary:hover { background: #f5f5f0; }
   .btn-row { display: flex; gap: 10px; margin-top: 1.25rem; flex-wrap: wrap; }
@@ -79,7 +85,9 @@
   .shed-breakdown-card .row { display: flex; justify-content: space-between; font-size: 12px; color: #555; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
   .shed-breakdown-card .row:last-child { border-bottom: none; }
   .shed-breakdown-card .row span:last-child { font-weight: 600; color: #1a1a1a; }
-  .toast { position: fixed; bottom: 24px; right: 24px; background: #27500A; color: #EAF3DE; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; display: none; z-index: 999; }
+  .toast { position: fixed; bottom: 24px; right: 24px; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+  .toast.success { background: #27500A; }
+  .toast.error { background: #c0392b; }
   .combined-banner { background: #fff; border: 1px solid #e0e0e0; border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; }
   .combined-banner h3 { font-size: 14px; font-weight: 600; color: #3B6D11; margin-bottom: 1rem; }
   .combined-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
@@ -88,6 +96,7 @@
   .combined-stat .lbl { font-size: 11px; color: #888; margin-top: 2px; }
   .farm-section-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 1.5rem 0 0.75rem; display: flex; align-items: center; gap: 8px; }
   .farm-section-title span { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; background: #EAF3DE; color: #3B6D11; }
+  .loading-spinner { text-align: center; padding: 2rem; color: #888; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -100,7 +109,10 @@
         <div class="logo-sub">Daily Production Records — All Farms</div>
       </div>
     </div>
-    <div class="today-label" id="today-date"></div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span class="db-status loading" id="db-status">⏳ Connecting...</span>
+      <div class="today-label" id="today-date"></div>
+    </div>
   </div>
 
   <div class="farm-switcher">
@@ -134,7 +146,7 @@
           </div>
           <div class="form-group" style="margin-top:14px;"><label>📝 Notes</label><input type="text" id="khushnoor-notes" placeholder="Any observations..."></div>
           <div class="btn-row">
-            <button class="btn-primary" onclick="saveEntry('khushnoor')">✓ Save Record</button>
+            <button class="btn-primary" id="save-btn-khushnoor" onclick="saveEntry('khushnoor')">✓ Save Record</button>
             <button class="btn-secondary" onclick="closeForm('khushnoor')">✕ Cancel</button>
           </div>
         </div>
@@ -183,7 +195,7 @@
           </div>
           <div class="form-group" style="margin-top:14px;"><label>📝 Notes</label><input type="text" id="qazi-notes" placeholder="Any observations..."></div>
           <div class="btn-row">
-            <button class="btn-primary" onclick="saveEntry('qazi')">✓ Save Record</button>
+            <button class="btn-primary" id="save-btn-qazi" onclick="saveEntry('qazi')">✓ Save Record</button>
             <button class="btn-secondary" onclick="closeForm('qazi')">✕ Cancel</button>
           </div>
         </div>
@@ -226,20 +238,52 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Supabase setup ──────────────────────────────────────────────
+const SUPABASE_URL = 'https://qieowretdoilaunkxmzd.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpZW93cmV0ZG9pbGF1bmt4bXpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTI0MDYsImV4cCI6MjA5NzQyODQwNn0.hZUbB2SBZlcRNBT05lktIW_fIcmi-qpSi3jolwsqwT0';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── Farm config ─────────────────────────────────────────────────
 const FARMS = {
   khushnoor: { name:'Khushnoor Poultry Farm', sheds: Array.from({length:6}, (_,i)=>'Shed '+(i+1)) },
   qazi:      { name:'Qazi Poultry Farm',      sheds: Array.from({length:12},(_,i)=>'Shed '+(i+1)) }
 };
-let records = { khushnoor:[], qazi:[] };
-try { records.khushnoor = JSON.parse(localStorage.getItem('kpf_khushnoor')||'[]'); } catch(e){}
-try { records.qazi      = JSON.parse(localStorage.getItem('kpf_qazi')||'[]'); }      catch(e){}
+
+let cache = { khushnoor:[], qazi:[] };
 let selectedShed = { khushnoor:null, qazi:null };
 
-function saveData(farm){ localStorage.setItem('kpf_'+farm, JSON.stringify(records[farm])); }
+// ── Helpers ─────────────────────────────────────────────────────
 function today(){ return new Date().toISOString().split('T')[0]; }
 function fmt(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-PK',{day:'2-digit',month:'short',year:'numeric'}); }
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.style.display='block'; setTimeout(()=>t.style.display='none',2500); }
+function showToast(msg, type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast '+type; t.style.display='block';
+  setTimeout(()=>t.style.display='none', 2800);
+}
+function setDbStatus(state){
+  const el=document.getElementById('db-status');
+  if(state==='connected'){ el.textContent='🟢 Cloud connected'; el.className='db-status connected'; }
+  else if(state==='error'){ el.textContent='🔴 Offline'; el.className='db-status disconnected'; }
+  else { el.textContent='⏳ Connecting...'; el.className='db-status loading'; }
+}
 
+// ── Load data from Supabase ─────────────────────────────────────
+async function loadAll(){
+  try {
+    const { data, error } = await sb.from('shed_records').select('*').order('date', {ascending:false});
+    if(error) throw error;
+    cache.khushnoor = data.filter(r=>r.farm==='khushnoor');
+    cache.qazi      = data.filter(r=>r.farm==='qazi');
+    setDbStatus('connected');
+    renderShedGrid('khushnoor');
+    renderShedGrid('qazi');
+  } catch(e){
+    setDbStatus('error');
+    showToast('Could not connect to database. Check your internet.', 'error');
+  }
+}
+
+// ── Switch farm/tab ─────────────────────────────────────────────
 function switchFarm(farm, el){
   document.querySelectorAll('.farm-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
@@ -247,7 +291,6 @@ function switchFarm(farm, el){
   document.getElementById('farm-'+farm).style.display='block';
   if(farm==='combined') renderCombined();
 }
-
 function switchTab(farm, tab, el){
   el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
@@ -257,16 +300,18 @@ function switchTab(farm, tab, el){
   if(tab==='summary') renderSummary(farm);
 }
 
+// ── Shed filter dropdowns ───────────────────────────────────────
 function initFilters(){
   Object.keys(FARMS).forEach(farm=>{
-    const opts = FARMS[farm].sheds.map(s=>`<option value="${s}">${s}</option>`).join('');
+    const opts=FARMS[farm].sheds.map(s=>`<option value="${s}">${s}</option>`).join('');
     ['filter-shed-','sum-shed-'].forEach(p=>{ const s=document.getElementById(p+farm); if(s) s.innerHTML='<option value="all">All sheds</option>'+opts; });
   });
 }
 
+// ── Shed grid ───────────────────────────────────────────────────
 function renderShedGrid(farm){
   document.getElementById('shed-grid-'+farm).innerHTML = FARMS[farm].sheds.map(shed=>{
-    const rec=records[farm].find(r=>r.shed===shed&&r.date===today());
+    const rec=cache[farm].find(r=>r.shed===shed&&r.date===today());
     return `<button class="shed-btn ${selectedShed[farm]===shed?'selected':''}" onclick="selectShed('${farm}','${shed}')">
       <div class="shed-name">🏠 ${shed}</div>
       <div class="shed-count">${rec?rec.eggs+' eggs · '+rec.birds+' birds':'No entry today'}</div>
@@ -278,7 +323,7 @@ function renderShedGrid(farm){
 function selectShed(farm, shed){
   selectedShed[farm]=shed;
   renderShedGrid(farm);
-  const ex=records[farm].find(r=>r.shed===shed&&r.date===today());
+  const ex=cache[farm].find(r=>r.shed===shed&&r.date===today());
   document.getElementById('shed-title-'+farm).textContent=shed+' — Daily Entry';
   document.getElementById('date-'+farm).value=today();
   document.getElementById(farm+'-eggs').value=ex?ex.eggs:'';
@@ -299,31 +344,40 @@ function closeForm(farm){
   renderShedGrid(farm);
 }
 
-function saveEntry(farm){
+// ── Save entry to Supabase ──────────────────────────────────────
+async function saveEntry(farm){
   const date=document.getElementById('date-'+farm).value;
-  if(!date){showToast('Please select a date');return;}
+  if(!date){showToast('Please select a date','error');return;}
+  const btn=document.getElementById('save-btn-'+farm);
+  btn.disabled=true; btn.textContent='Saving...';
   const rec={
-    shed:selectedShed[farm], date,
+    farm, shed:selectedShed[farm], date,
     eggs:parseInt(document.getElementById(farm+'-eggs').value)||0,
     broken:parseInt(document.getElementById(farm+'-broken').value)||0,
     birds:parseInt(document.getElementById(farm+'-birds').value)||0,
     mortality:parseInt(document.getElementById(farm+'-mortality').value)||0,
     feed:parseFloat(document.getElementById(farm+'-feed').value)||0,
     medicine:document.getElementById(farm+'-medicine').value.trim(),
-    notes:document.getElementById(farm+'-notes').value.trim(),
-    savedAt:new Date().toISOString()
+    notes:document.getElementById(farm+'-notes').value.trim()
   };
-  const idx=records[farm].findIndex(r=>r.shed===selectedShed[farm]&&r.date===date);
-  if(idx>=0) records[farm][idx]=rec; else records[farm].push(rec);
-  saveData(farm);
-  showToast('✓ Record saved for '+selectedShed[farm]);
-  closeForm(farm);
+  try {
+    const { error } = await sb.from('shed_records').upsert(rec, { onConflict:'farm,shed,date' });
+    if(error) throw error;
+    showToast('✓ Record saved for '+selectedShed[farm]);
+    await loadAll();
+    closeForm(farm);
+  } catch(e){
+    showToast('Failed to save. Check your connection.','error');
+  } finally {
+    btn.disabled=false; btn.textContent='✓ Save Record';
+  }
 }
 
+// ── Records table ───────────────────────────────────────────────
 function renderRecords(farm){
   const shed=document.getElementById('filter-shed-'+farm).value;
   const date=document.getElementById('filter-date-'+farm).value;
-  let data=[...records[farm]];
+  let data=[...cache[farm]];
   if(shed!=='all') data=data.filter(r=>r.shed===shed);
   if(date) data=data.filter(r=>r.date===date);
   data.sort((a,b)=>b.date.localeCompare(a.date)||a.shed.localeCompare(b.shed));
@@ -347,8 +401,9 @@ function clearFilters(farm){
   renderRecords(farm);
 }
 
+// ── Summary ─────────────────────────────────────────────────────
 function getFiltered(farm,period,shed){
-  let data=[...records[farm]];
+  let data=[...cache[farm]];
   if(shed!=='all') data=data.filter(r=>r.shed===shed);
   const t=today(); const now=new Date();
   if(period==='today') data=data.filter(r=>r.date===t);
@@ -392,7 +447,7 @@ function renderSummary(farm){
 
 function renderCombined(){
   const period=document.getElementById('combined-period').value;
-  const kd=getFiltered('khushnoor',period,'all'), qd=getFiltered('qazi',period,'all'), all=[...kd,...qd];
+  const kd=getFiltered('khushnoor',period,'all'),qd=getFiltered('qazi',period,'all'),all=[...kd,...qd];
   const te=all.reduce((s,r)=>s+r.eggs,0),tb=all.reduce((s,r)=>s+r.broken,0);
   document.getElementById('combined-stats').innerHTML=`
     <div class="combined-stat"><div class="val">${(te-tb).toLocaleString()}</div><div class="lbl">Net eggs</div></div>
@@ -405,10 +460,10 @@ function renderCombined(){
   document.getElementById('combined-qazi').innerHTML=metricCards(qd);
 }
 
+// ── Init ────────────────────────────────────────────────────────
 document.getElementById('today-date').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 initFilters();
-renderShedGrid('khushnoor');
-renderShedGrid('qazi');
+loadAll();
 </script>
 </body>
 </html>
