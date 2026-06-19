@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khushnoor Poultry Farm</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
+  .app { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem; }
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 40px; height: 40px; border-radius: 10px; background: #EAF3DE; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .logo-title { font-size: 20px; font-weight: 600; color: #1a1a1a; }
+  .logo-sub { font-size: 12px; color: #666; }
+  .today-label { font-size: 13px; color: #666; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 6px 12px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid #e0e0e0; margin-bottom: 1.5rem; }
+  .tab { padding: 10px 18px; font-size: 14px; cursor: pointer; border: none; background: none; color: #666; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; border-radius: 6px 6px 0 0; }
+  .tab.active { color: #3B6D11; border-bottom-color: #3B6D11; font-weight: 600; background: #f0f7e8; }
+  .tab:hover:not(.active) { color: #333; background: #f5f5f0; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .shed-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .shed-btn { padding: 14px 12px; border: 1.5px solid #e0e0e0; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; transition: all 0.15s; }
+  .shed-btn:hover { border-color: #3B6D11; box-shadow: 0 2px 8px rgba(59,109,17,0.1); }
+  .shed-btn.selected { border: 2px solid #3B6D11; background: #f0f7e8; }
+  .shed-btn .shed-name { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .shed-btn .shed-count { font-size: 11px; color: #666; margin-bottom: 6px; }
+  .shed-btn .shed-status { font-size: 11px; padding: 2px 8px; border-radius: 99px; display: inline-block; }
+  .status-done { background: #C0DD97; color: #27500A; }
+  .status-pending { background: #f0f0f0; color: #888; }
+  .form-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+  .form-title { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .form-title span { color: #3B6D11; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group label { font-size: 12px; color: #555; font-weight: 500; }
+  .form-group input, .form-group select, .form-group textarea { border: 1px solid #ddd; border-radius: 8px; padding: 9px 12px; font-size: 14px; color: #1a1a1a; background: #fafafa; outline: none; transition: border 0.15s; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3B6D11; background: #fff; box-shadow: 0 0 0 3px rgba(59,109,17,0.08); }
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .divider { border: none; border-top: 1px solid #f0f0f0; margin: 1.25rem 0; }
+  .btn-primary { background: #3B6D11; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary:hover { background: #27500A; }
+  .btn-secondary { background: #fff; color: #333; border: 1px solid #ddd; border-radius: 8px; padding: 10px 18px; font-size: 14px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-secondary:hover { background: #f5f5f0; }
+  .btn-danger { background: #fff; color: #c0392b; border: 1px solid #f0c0bb; border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .btn-danger:hover { background: #fff5f5; }
+  .btn-row { display: flex; gap: 10px; margin-top: 1.25rem; flex-wrap: wrap; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .metric-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; }
+  .metric-label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .metric-value { font-size: 26px; font-weight: 700; color: #1a1a1a; }
+  .metric-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .metric-card.highlight { background: #f0f7e8; border-color: #C0DD97; }
+  .metric-card.highlight .metric-value { color: #3B6D11; }
+  .records-wrap { overflow-x: auto; }
+  .records-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
+  .records-table th { text-align: left; padding: 10px 12px; color: #888; border-bottom: 1px solid #f0f0f0; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; background: #fafafa; }
+  .records-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; vertical-align: middle; }
+  .records-table tr:last-child td { border-bottom: none; }
+  .records-table tr:hover td { background: #fafff5; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; display: inline-block; font-weight: 500; }
+  .badge-green { background: #C0DD97; color: #27500A; }
+  .badge-amber { background: #FAC775; color: #633806; }
+  .badge-red { background: #f7c1c1; color: #791F1F; }
+  .empty-state { text-align: center; padding: 3rem 1rem; color: #aaa; font-size: 14px; }
+  .empty-icon { font-size: 36px; margin-bottom: 8px; }
+  .filter-row { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
+  .filter-row select, .filter-row input[type="date"] { font-size: 13px; padding: 7px 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; outline: none; }
+  .filter-row select:focus, .filter-row input:focus { border-color: #3B6D11; }
+  .section-label { font-size: 13px; color: #666; margin-bottom: 0.75rem; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #27500A; color: #EAF3DE; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; display: none; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+  .shed-breakdown-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .shed-breakdown-card { background: #fafafa; border: 1px solid #eee; border-radius: 10px; padding: 1rem; }
+  .shed-breakdown-card .shed-title { font-size: 13px; font-weight: 600; color: #3B6D11; margin-bottom: 8px; }
+  .shed-breakdown-card .row { display: flex; justify-content: space-between; font-size: 12px; color: #555; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+  .shed-breakdown-card .row:last-child { border-bottom: none; }
+  .shed-breakdown-card .row span:last-child { font-weight: 600; color: #1a1a1a; }
+  @media (max-width: 600px) { .logo-title { font-size: 16px; } .metric-value { font-size: 20px; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🐔</div>
+      <div>
+        <div class="logo-title">Khushnoor Poultry Farm</div>
+        <div class="logo-sub">Shed Production Records</div>
+      </div>
+    </div>
+    <div class="today-label" id="today-date"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('entry', this)">📋 Daily Entry</button>
+    <button class="tab" onclick="switchTab('records', this)">🗂️ Records</button>
+    <button class="tab" onclick="switchTab('summary', this)">📊 Summary</button>
+  </div>
+
+  <!-- DAILY ENTRY -->
+  <div id="tab-entry" class="section active">
+    <p class="section-label">Select a shed to record today's data:</p>
+    <div class="shed-grid" id="shed-grid"></div>
+    <div id="entry-form" style="display:none;">
+      <div class="form-card">
+        <div class="form-title">🏠 <span id="selected-shed-title"></span></div>
+        <div class="form-group" style="max-width:200px; margin-bottom:1rem;">
+          <label>Date</label>
+          <input type="date" id="entry-date">
+        </div>
+        <hr class="divider">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>🥚 Total eggs collected</label>
+            <input type="number" id="f-eggs" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>🩹 Broken eggs</label>
+            <input type="number" id="f-broken" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>🐔 Total birds in shed</label>
+            <input type="number" id="f-birds" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>💀 Mortality (deaths today)</label>
+            <input type="number" id="f-mortality" placeholder="0" min="0">
+          </div>
+          <div class="form-group">
+            <label>🌾 Feed consumed (kg)</label>
+            <input type="number" id="f-feed" placeholder="0" min="0" step="0.5">
+          </div>
+          <div class="form-group">
+            <label>💊 Medicine / Vaccine given</label>
+            <input type="text" id="f-medicine" placeholder="e.g. ND Vaccine, Vitamin C">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:14px;">
+          <label>📝 Notes (optional)</label>
+          <input type="text" id="f-notes" placeholder="Any observations for this shed...">
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="saveEntry()">✓ Save Record</button>
+          <button class="btn-secondary" onclick="closeForm()">✕ Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORDS -->
+  <div id="tab-records" class="section">
+    <div class="filter-row">
+      <select id="filter-shed" onchange="renderRecords()">
+        <option value="all">All sheds</option>
+        <option value="Shed 1">Shed 1</option>
+        <option value="Shed 2">Shed 2</option>
+        <option value="Shed 3">Shed 3</option>
+        <option value="Shed 4">Shed 4</option>
+        <option value="Shed 5">Shed 5</option>
+        <option value="Shed 6">Shed 6</option>
+      </select>
+      <input type="date" id="filter-date" onchange="renderRecords()">
+      <button class="btn-secondary" onclick="clearFilters()" style="padding:7px 14px; font-size:13px;">↺ Clear</button>
+    </div>
+    <div class="form-card" style="padding:0; overflow:hidden;">
+      <div class="records-wrap">
+        <div id="records-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="tab-summary" class="section">
+    <div class="filter-row">
+      <select id="sum-period" onchange="renderSummary()">
+        <option value="today">Today</option>
+        <option value="week">This week</option>
+        <option value="month" selected>This month</option>
+        <option value="all">All time</option>
+      </select>
+      <select id="sum-shed" onchange="renderSummary()">
+        <option value="all">All sheds</option>
+        <option value="Shed 1">Shed 1</option>
+        <option value="Shed 2">Shed 2</option>
+        <option value="Shed 3">Shed 3</option>
+        <option value="Shed 4">Shed 4</option>
+        <option value="Shed 5">Shed 5</option>
+        <option value="Shed 6">Shed 6</option>
+      </select>
+    </div>
+    <div class="summary-grid" id="summary-cards"></div>
+    <div class="form-card">
+      <div style="font-size:14px; font-weight:600; margin-bottom:1rem;">Per shed breakdown</div>
+      <div class="shed-breakdown-grid" id="shed-breakdown"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEDS = ['Shed 1','Shed 2','Shed 3','Shed 4','Shed 5','Shed 6'];
+let records = JSON.parse(localStorage.getItem('kpf_records') || '[]');
+let selectedShed = null;
+
+function saveData() { localStorage.setItem('kpf_records', JSON.stringify(records)); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmt(d) { return new Date(d + 'T00:00:00').toLocaleDateString('en-PK', { day:'2-digit', month:'short', year:'numeric' }); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'records') renderRecords();
+  if (tab === 'summary') renderSummary();
+}
+
+function renderShedGrid() {
+  document.getElementById('shed-grid').innerHTML = SHEDS.map(shed => {
+    const rec = records.find(r => r.shed === shed && r.date === today());
+    return `<button class="shed-btn ${rec ? '' : ''} ${selectedShed === shed ? 'selected' : ''}" onclick="selectShed('${shed}')">
+      <div class="shed-name">🏠 ${shed}</div>
+      <div class="shed-count">${rec ? rec.eggs + ' eggs · ' + rec.birds + ' birds' : 'No entry today'}</div>
+      <span class="shed-status ${rec ? 'status-done' : 'status-pending'}">${rec ? '✓ Recorded' : '⏳ Pending'}</span>
+    </button>`;
+  }).join('');
+}
+
+function selectShed(shed) {
+  selectedShed = shed;
+  renderShedGrid();
+  const ex = records.find(r => r.shed === shed && r.date === today());
+  document.getElementById('selected-shed-title').textContent = shed + ' — Daily Entry';
+  document.getElementById('entry-date').value = today();
+  document.getElementById('f-eggs').value = ex ? ex.eggs : '';
+  document.getElementById('f-broken').value = ex ? ex.broken : '';
+  document.getElementById('f-birds').value = ex ? ex.birds : '';
+  document.getElementById('f-mortality').value = ex ? ex.mortality : '';
+  document.getElementById('f-feed').value = ex ? ex.feed : '';
+  document.getElementById('f-medicine').value = ex ? ex.medicine : '';
+  document.getElementById('f-notes').value = ex ? ex.notes : '';
+  document.getElementById('entry-form').style.display = 'block';
+  document.getElementById('entry-form').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function closeForm() {
+  selectedShed = null;
+  document.getElementById('entry-form').style.display = 'none';
+  renderShedGrid();
+}
+
+function saveEntry() {
+  const date = document.getElementById('entry-date').value;
+  if (!date) { showToast('Please select a date'); return; }
+  const rec = {
+    shed: selectedShed, date,
+    eggs: parseInt(document.getElementById('f-eggs').value) || 0,
+    broken: parseInt(document.getElementById('f-broken').value) || 0,
+    birds: parseInt(document.getElementById('f-birds').value) || 0,
+    mortality: parseInt(document.getElementById('f-mortality').value) || 0,
+    feed: parseFloat(document.getElementById('f-feed').value) || 0,
+    medicine: document.getElementById('f-medicine').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    savedAt: new Date().toISOString()
+  };
+  const idx = records.findIndex(r => r.shed === selectedShed && r.date === date);
+  if (idx >= 0) records[idx] = rec; else records.push(rec);
+  saveData();
+  showToast('✓ Record saved for ' + selectedShed);
+  closeForm();
+}
+
+function renderRecords() {
+  const shed = document.getElementById('filter-shed').value;
+  const date = document.getElementById('filter-date').value;
+  let data = [...records];
+  if (shed !== 'all') data = data.filter(r => r.shed === shed);
+  if (date) data = data.filter(r => r.date === date);
+  data.sort((a,b) => b.date.localeCompare(a.date) || a.shed.localeCompare(b.shed));
+  const c = document.getElementById('records-container');
+  if (!data.length) {
+    c.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div>No records found</div>';
+    return;
+  }
+  c.innerHTML = `<table class="records-table">
+    <thead><tr><th>Date</th><th>Shed</th><th>Eggs</th><th>Broken</th><th>Birds</th><th>Deaths</th><th>Feed (kg)</th><th>Medicine</th><th>Notes</th></tr></thead>
+    <tbody>${data.map(r => `<tr>
+      <td>${fmt(r.date)}</td>
+      <td><span class="badge badge-green">${r.shed}</span></td>
+      <td><strong>${r.eggs}</strong></td>
+      <td>${r.broken > 0 ? `<span class="badge badge-amber">${r.broken}</span>` : '0'}</td>
+      <td>${r.birds}</td>
+      <td>${r.mortality > 0 ? `<span class="badge badge-red">${r.mortality}</span>` : '0'}</td>
+      <td>${r.feed}</td>
+      <td style="font-size:12px; color:#666;">${r.medicine || '—'}</td>
+      <td style="font-size:12px; color:#888;">${r.notes || '—'}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function clearFilters() {
+  document.getElementById('filter-shed').value = 'all';
+  document.getElementById('filter-date').value = '';
+  renderRecords();
+}
+
+function getFiltered(period, shed) {
+  let data = [...records];
+  if (shed !== 'all') data = data.filter(r => r.shed === shed);
+  const t = today(); const now = new Date();
+  if (period === 'today') data = data.filter(r => r.date === t);
+  else if (period === 'week') { const s = new Date(now); s.setDate(now.getDate()-6); data = data.filter(r => r.date >= s.toISOString().split('T')[0]); }
+  else if (period === 'month') { const s = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]; data = data.filter(r => r.date >= s); }
+  return data;
+}
+
+function renderSummary() {
+  const period = document.getElementById('sum-period').value;
+  const shed = document.getElementById('sum-shed').value;
+  const data = getFiltered(period, shed);
+  const totalEggs = data.reduce((s,r)=>s+r.eggs,0);
+  const totalBroken = data.reduce((s,r)=>s+r.broken,0);
+  const totalMortality = data.reduce((s,r)=>s+r.mortality,0);
+  const totalFeed = data.reduce((s,r)=>s+r.feed,0);
+  const netEggs = totalEggs - totalBroken;
+  const yieldRate = totalEggs ? Math.round((netEggs/totalEggs)*100) : 0;
+  document.getElementById('summary-cards').innerHTML = `
+    <div class="metric-card highlight"><div class="metric-label">Net eggs</div><div class="metric-value">${netEggs.toLocaleString()}</div><div class="metric-sub">after breakage</div></div>
+    <div class="metric-card"><div class="metric-label">Total collected</div><div class="metric-value">${totalEggs.toLocaleString()}</div><div class="metric-sub">eggs</div></div>
+    <div class="metric-card"><div class="metric-label">Broken eggs</div><div class="metric-value">${totalBroken}</div><div class="metric-sub">${yieldRate}% yield rate</div></div>
+    <div class="metric-card"><div class="metric-label">Mortality</div><div class="metric-value">${totalMortality}</div><div class="metric-sub">total deaths</div></div>
+    <div class="metric-card"><div class="metric-label">Feed used</div><div class="metric-value">${totalFeed.toFixed(1)}</div><div class="metric-sub">kg total</div></div>
+    <div class="metric-card"><div class="metric-label">Records</div><div class="metric-value">${data.length}</div><div class="metric-sub">entries logged</div></div>
+  `;
+  const shedData = SHEDS.map(s => {
+    const d = data.filter(r => r.shed === s);
+    return { shed:s, eggs:d.reduce((x,r)=>x+r.eggs,0), broken:d.reduce((x,r)=>x+r.broken,0), deaths:d.reduce((x,r)=>x+r.mortality,0), feed:d.reduce((x,r)=>x+r.feed,0), entries:d.length };
+  }).filter(s => s.entries > 0);
+  const bd = document.getElementById('shed-breakdown');
+  if (!shedData.length) { bd.innerHTML = '<div style="color:#aaa; font-size:13px; padding:1rem;">No data for selected period.</div>'; return; }
+  bd.innerHTML = shedData.map(s => `<div class="shed-breakdown-card">
+    <div class="shed-title">🏠 ${s.shed}</div>
+    <div class="row"><span>Eggs collected</span><span>${s.eggs.toLocaleString()}</span></div>
+    <div class="row"><span>Broken eggs</span><span>${s.broken}</span></div>
+    <div class="row"><span>Deaths</span><span>${s.deaths}</span></div>
+    <div class="row"><span>Feed consumed</span><span>${s.feed.toFixed(1)} kg</span></div>
+    <div class="row"><span>Entries logged</span><span>${s.entries}</span></div>
+  </div>`).join('');
+}
+
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-PK', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+renderShedGrid();
+</script>
+</body>
+</html>
