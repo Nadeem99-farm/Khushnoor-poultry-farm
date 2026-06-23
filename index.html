@@ -8,78 +8,102 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a1a; min-height: 100vh; }
-  .app { max-width: 1000px; margin: 0 auto; padding: 1.5rem 1rem; }
+  .app { max-width: 1060px; margin: 0 auto; padding: 1.5rem 1rem; }
   .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
   .logo { display: flex; align-items: center; gap: 10px; }
   .logo-icon { width: 42px; height: 42px; border-radius: 10px; background: #EAF3DE; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-  .logo-title { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+  .logo-title { font-size: 20px; font-weight: 700; }
   .logo-sub { font-size: 12px; color: #666; }
   .today-label { font-size: 13px; color: #666; background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 6px 12px; }
   .db-status { font-size: 12px; padding: 4px 10px; border-radius: 99px; font-weight: 500; }
   .db-status.connected { background: #C0DD97; color: #27500A; }
   .db-status.disconnected { background: #f7c1c1; color: #791F1F; }
   .db-status.loading { background: #f0f0f0; color: #888; }
-  .farm-switcher { display: flex; gap: 0; margin-bottom: 1.5rem; border: 1.5px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fff; }
-  .farm-tab { flex: 1; padding: 14px 10px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; background: none; color: #888; transition: all 0.15s; text-align: center; border-right: 1.5px solid #e0e0e0; }
+  .farm-switcher { display: flex; margin-bottom: 1.5rem; border: 1.5px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fff; }
+  .farm-tab { flex: 1; padding: 13px 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; background: none; color: #888; transition: all 0.15s; text-align: center; border-right: 1.5px solid #e0e0e0; }
   .farm-tab:last-child { border-right: none; }
   .farm-tab.active { background: #3B6D11; color: #fff; }
   .farm-tab:hover:not(.active) { background: #f5f5f0; color: #333; }
-  .farm-badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 99px; margin-left: 6px; }
+  .farm-badge { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 99px; margin-left: 4px; }
   .farm-tab.active .farm-badge { background: rgba(255,255,255,0.25); color: #fff; }
   .farm-tab:not(.active) .farm-badge { background: #f0f0f0; color: #888; }
   .tabs { display: flex; gap: 4px; border-bottom: 1px solid #e0e0e0; margin-bottom: 1.5rem; }
-  .tab { padding: 10px 18px; font-size: 14px; cursor: pointer; border: none; background: none; color: #666; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; border-radius: 6px 6px 0 0; }
+  .tab { padding: 9px 16px; font-size: 13px; cursor: pointer; border: none; background: none; color: #666; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; border-radius: 6px 6px 0 0; }
   .tab.active { color: #3B6D11; border-bottom-color: #3B6D11; font-weight: 600; background: #f0f7e8; }
   .tab:hover:not(.active) { color: #333; background: #f5f5f0; }
   .section { display: none; }
   .section.active { display: block; }
-  .shed-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
-  .shed-btn { padding: 12px 10px; border: 1.5px solid #e0e0e0; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; transition: all 0.15s; }
+  .shed-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .shed-btn { padding: 12px 10px; border: 1.5px solid #e0e0e0; border-radius: 12px; background: #fff; cursor: pointer; text-align: left; transition: all 0.15s; position: relative; }
   .shed-btn:hover { border-color: #3B6D11; }
   .shed-btn.selected { border: 2px solid #3B6D11; background: #f0f7e8; }
-  .shed-btn .shed-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
-  .shed-btn .shed-count { font-size: 11px; color: #666; margin-bottom: 5px; }
+  .shed-btn.not-setup { border-style: dashed; background: #fafafa; }
+  .shed-btn .shed-name { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .shed-btn .shed-birds { font-size: 11px; color: #666; margin-bottom: 5px; }
   .shed-btn .shed-status { font-size: 11px; padding: 2px 7px; border-radius: 99px; display: inline-block; }
   .status-done { background: #C0DD97; color: #27500A; }
-  .status-pending { background: #f0f0f0; color: #888; }
+  .status-pending { background: #FFF3CD; color: #856404; }
+  .status-setup { background: #f0f0f0; color: #888; }
+  .setup-badge { position: absolute; top: 8px; right: 8px; font-size: 10px; background: #FAC775; color: #633806; padding: 1px 6px; border-radius: 99px; }
   .form-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
-  .form-title { font-size: 16px; font-weight: 600; color: #1a1a1a; margin-bottom: 1.25rem; }
-  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+  .form-title { font-size: 15px; font-weight: 600; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .form-section { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #3B6D11; margin: 1.25rem 0 0.75rem; }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+  .form-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
   .form-group { display: flex; flex-direction: column; gap: 5px; }
   .form-group label { font-size: 12px; color: #555; font-weight: 500; }
-  .form-group input { border: 1px solid #ddd; border-radius: 8px; padding: 9px 12px; font-size: 14px; color: #1a1a1a; background: #fafafa; outline: none; transition: border 0.15s; font-family: inherit; }
-  .form-group input:focus { border-color: #3B6D11; background: #fff; box-shadow: 0 0 0 3px rgba(59,109,17,0.08); }
+  .form-group input, .form-group select { border: 1px solid #ddd; border-radius: 8px; padding: 8px 11px; font-size: 14px; color: #1a1a1a; background: #fafafa; outline: none; transition: border 0.15s; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus { border-color: #3B6D11; background: #fff; box-shadow: 0 0 0 3px rgba(59,109,17,0.08); }
   input[type="number"] { -moz-appearance: textfield; }
   input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .calc-display { background: #f0f7e8; border: 1px solid #C0DD97; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #27500A; font-weight: 600; }
   .divider { border: none; border-top: 1px solid #f0f0f0; margin: 1.25rem 0; }
   .btn-primary { background: #3B6D11; color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-primary:hover { background: #27500A; }
   .btn-primary:disabled { background: #aaa; cursor: not-allowed; }
   .btn-secondary { background: #fff; color: #333; border: 1px solid #ddd; border-radius: 8px; padding: 10px 18px; font-size: 14px; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-secondary:hover { background: #f5f5f0; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; cursor: pointer; border: 1px solid #ddd; background: #fff; color: #333; transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px; }
+  .btn-sm:hover { background: #f5f5f0; }
+  .btn-sm.green { background: #f0f7e8; border-color: #C0DD97; color: #27500A; }
   .btn-row { display: flex; gap: 10px; margin-top: 1.25rem; flex-wrap: wrap; }
+  .medicine-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+  .medicine-item { display: flex; gap: 8px; align-items: center; }
+  .medicine-item input { flex: 1; }
+  .medicine-item button { padding: 7px 10px; border: 1px solid #f7c1c1; border-radius: 6px; background: #fff5f5; color: #c0392b; cursor: pointer; font-size: 13px; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .kpi-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; }
+  .kpi-card.green { background: #f0f7e8; border-color: #C0DD97; }
+  .kpi-card.amber { background: #FFF8E8; border-color: #FAC775; }
+  .kpi-card.red { background: #fff5f5; border-color: #f7c1c1; }
+  .kpi-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .kpi-value { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+  .kpi-card.green .kpi-value { color: #27500A; }
+  .kpi-card.amber .kpi-value { color: #856404; }
+  .kpi-card.red .kpi-value { color: #791F1F; }
+  .kpi-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
   .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
   .metric-card { background: #fff; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1rem; }
   .metric-label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
-  .metric-value { font-size: 24px; font-weight: 700; color: #1a1a1a; }
+  .metric-value { font-size: 22px; font-weight: 700; }
   .metric-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
   .metric-card.highlight { background: #f0f7e8; border-color: #C0DD97; }
   .metric-card.highlight .metric-value { color: #3B6D11; }
   .records-wrap { overflow-x: auto; }
-  .records-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 620px; }
-  .records-table th { text-align: left; padding: 10px 12px; color: #888; border-bottom: 1px solid #f0f0f0; font-weight: 600; font-size: 11px; text-transform: uppercase; background: #fafafa; }
-  .records-table td { padding: 10px 12px; border-bottom: 1px solid #f5f5f5; color: #1a1a1a; vertical-align: middle; }
+  .records-table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 700px; }
+  .records-table th { text-align: left; padding: 9px 11px; color: #888; border-bottom: 1px solid #f0f0f0; font-weight: 600; font-size: 11px; text-transform: uppercase; background: #fafafa; }
+  .records-table td { padding: 9px 11px; border-bottom: 1px solid #f5f5f5; vertical-align: middle; }
   .records-table tr:last-child td { border-bottom: none; }
   .records-table tr:hover td { background: #fafff5; }
-  .badge { font-size: 11px; padding: 3px 10px; border-radius: 99px; display: inline-block; font-weight: 500; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; display: inline-block; font-weight: 500; }
   .badge-green { background: #C0DD97; color: #27500A; }
   .badge-amber { background: #FAC775; color: #633806; }
   .badge-red { background: #f7c1c1; color: #791F1F; }
   .empty-state { text-align: center; padding: 3rem 1rem; color: #aaa; font-size: 14px; }
   .filter-row { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center; }
-  .filter-row select, .filter-row input[type="date"] { font-size: 13px; padding: 7px 12px; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; outline: none; }
+  .filter-row select, .filter-row input[type="date"] { font-size: 13px; padding: 7px 11px; border-radius: 8px; border: 1px solid #ddd; background: #fff; color: #1a1a1a; outline: none; }
   .section-label { font-size: 13px; color: #666; margin-bottom: 0.75rem; }
-  .shed-breakdown-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .shed-breakdown-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
   .shed-breakdown-card { background: #fafafa; border: 1px solid #eee; border-radius: 10px; padding: 1rem; }
   .shed-breakdown-card .shed-title { font-size: 13px; font-weight: 600; color: #3B6D11; margin-bottom: 8px; }
   .shed-breakdown-card .row { display: flex; justify-content: space-between; font-size: 12px; color: #555; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
@@ -92,11 +116,14 @@
   .combined-banner h3 { font-size: 14px; font-weight: 600; color: #3B6D11; margin-bottom: 1rem; }
   .combined-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
   .combined-stat { text-align: center; background: #f5f5f0; border-radius: 10px; padding: 0.75rem; }
-  .combined-stat .val { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+  .combined-stat .val { font-size: 20px; font-weight: 700; }
   .combined-stat .lbl { font-size: 11px; color: #888; margin-top: 2px; }
-  .farm-section-title { font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 1.5rem 0 0.75rem; display: flex; align-items: center; gap: 8px; }
+  .farm-section-title { font-size: 15px; font-weight: 600; margin: 1.5rem 0 0.75rem; display: flex; align-items: center; gap: 8px; }
   .farm-section-title span { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 99px; background: #EAF3DE; color: #3B6D11; }
-  .loading-spinner { text-align: center; padding: 2rem; color: #888; font-size: 13px; }
+  .info-banner { background: #FFF8E8; border: 1px solid #FAC775; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #856404; margin-bottom: 1rem; }
+  .flock-info-bar { background: #f0f7e8; border: 1px solid #C0DD97; border-radius: 10px; padding: 10px 16px; font-size: 12px; color: #27500A; margin-bottom: 1rem; display: flex; gap: 20px; flex-wrap: wrap; }
+  .flock-info-bar span { font-weight: 600; }
+  modal-overlay { display: none; }
 </style>
 </head>
 <body>
@@ -126,31 +153,13 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('khushnoor','entry',this)">📋 Daily Entry</button>
       <button class="tab" onclick="switchTab('khushnoor','records',this)">🗂️ Records</button>
+      <button class="tab" onclick="switchTab('khushnoor','kpis',this)">📈 KPIs</button>
       <button class="tab" onclick="switchTab('khushnoor','summary',this)">📊 Summary</button>
     </div>
     <div id="khushnoor-entry" class="section active">
       <p class="section-label">Select a shed to record today's data:</p>
       <div class="shed-grid" id="shed-grid-khushnoor"></div>
-      <div id="entry-form-khushnoor" style="display:none;">
-        <div class="form-card">
-          <div class="form-title">🏠 <span id="shed-title-khushnoor"></span></div>
-          <div class="form-group" style="max-width:200px;margin-bottom:1rem;"><label>Date</label><input type="date" id="date-khushnoor"></div>
-          <hr class="divider">
-          <div class="form-grid">
-            <div class="form-group"><label>🥚 Total eggs collected</label><input type="number" id="khushnoor-eggs" placeholder="0" min="0"></div>
-            <div class="form-group"><label>🩹 Broken eggs</label><input type="number" id="khushnoor-broken" placeholder="0" min="0"></div>
-            <div class="form-group"><label>🐔 Total birds in shed</label><input type="number" id="khushnoor-birds" placeholder="0" min="0"></div>
-            <div class="form-group"><label>💀 Mortality (deaths today)</label><input type="number" id="khushnoor-mortality" placeholder="0" min="0"></div>
-            <div class="form-group"><label>🌾 Feed consumed (kg)</label><input type="number" id="khushnoor-feed" placeholder="0" min="0" step="0.5"></div>
-            <div class="form-group"><label>💊 Medicine / Vaccine</label><input type="text" id="khushnoor-medicine" placeholder="e.g. ND Vaccine"></div>
-          </div>
-          <div class="form-group" style="margin-top:14px;"><label>📝 Notes</label><input type="text" id="khushnoor-notes" placeholder="Any observations..."></div>
-          <div class="btn-row">
-            <button class="btn-primary" id="save-btn-khushnoor" onclick="saveEntry('khushnoor')">✓ Save Record</button>
-            <button class="btn-secondary" onclick="closeForm('khushnoor')">✕ Cancel</button>
-          </div>
-        </div>
-      </div>
+      <div id="entry-form-khushnoor" style="display:none;"></div>
     </div>
     <div id="khushnoor-records" class="section">
       <div class="filter-row">
@@ -160,6 +169,7 @@
       </div>
       <div class="form-card" style="padding:0;overflow:hidden;"><div class="records-wrap"><div id="records-khushnoor"></div></div></div>
     </div>
+    <div id="khushnoor-kpis" class="section"><div id="kpis-khushnoor"></div></div>
     <div id="khushnoor-summary" class="section">
       <div class="filter-row">
         <select id="sum-period-khushnoor" onchange="renderSummary('khushnoor')"><option value="today">Today</option><option value="week">This week</option><option value="month" selected>This month</option><option value="all">All time</option></select>
@@ -175,31 +185,13 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('qazi','entry',this)">📋 Daily Entry</button>
       <button class="tab" onclick="switchTab('qazi','records',this)">🗂️ Records</button>
+      <button class="tab" onclick="switchTab('qazi','kpis',this)">📈 KPIs</button>
       <button class="tab" onclick="switchTab('qazi','summary',this)">📊 Summary</button>
     </div>
     <div id="qazi-entry" class="section active">
       <p class="section-label">Select a shed to record today's data:</p>
       <div class="shed-grid" id="shed-grid-qazi"></div>
-      <div id="entry-form-qazi" style="display:none;">
-        <div class="form-card">
-          <div class="form-title">🏠 <span id="shed-title-qazi"></span></div>
-          <div class="form-group" style="max-width:200px;margin-bottom:1rem;"><label>Date</label><input type="date" id="date-qazi"></div>
-          <hr class="divider">
-          <div class="form-grid">
-            <div class="form-group"><label>🥚 Total eggs collected</label><input type="number" id="qazi-eggs" placeholder="0" min="0"></div>
-            <div class="form-group"><label>🩹 Broken eggs</label><input type="number" id="qazi-broken" placeholder="0" min="0"></div>
-            <div class="form-group"><label>🐔 Total birds in shed</label><input type="number" id="qazi-birds" placeholder="0" min="0"></div>
-            <div class="form-group"><label>💀 Mortality (deaths today)</label><input type="number" id="qazi-mortality" placeholder="0" min="0"></div>
-            <div class="form-group"><label>🌾 Feed consumed (kg)</label><input type="number" id="qazi-feed" placeholder="0" min="0" step="0.5"></div>
-            <div class="form-group"><label>💊 Medicine / Vaccine</label><input type="text" id="qazi-medicine" placeholder="e.g. ND Vaccine"></div>
-          </div>
-          <div class="form-group" style="margin-top:14px;"><label>📝 Notes</label><input type="text" id="qazi-notes" placeholder="Any observations..."></div>
-          <div class="btn-row">
-            <button class="btn-primary" id="save-btn-qazi" onclick="saveEntry('qazi')">✓ Save Record</button>
-            <button class="btn-secondary" onclick="closeForm('qazi')">✕ Cancel</button>
-          </div>
-        </div>
-      </div>
+      <div id="entry-form-qazi" style="display:none;"></div>
     </div>
     <div id="qazi-records" class="section">
       <div class="filter-row">
@@ -209,6 +201,7 @@
       </div>
       <div class="form-card" style="padding:0;overflow:hidden;"><div class="records-wrap"><div id="records-qazi"></div></div></div>
     </div>
+    <div id="qazi-kpis" class="section"><div id="kpis-qazi"></div></div>
     <div id="qazi-summary" class="section">
       <div class="filter-row">
         <select id="sum-period-qazi" onchange="renderSummary('qazi')"><option value="today">Today</option><option value="week">This week</option><option value="month" selected>This month</option><option value="all">All time</option></select>
@@ -234,73 +227,70 @@
     <div class="summary-grid" id="combined-qazi"></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Supabase setup ──────────────────────────────────────────────
 const SUPABASE_URL = 'https://qieowretdoilaunkxmzd.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpZW93cmV0ZG9pbGF1bmt4bXpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4NTI0MDYsImV4cCI6MjA5NzQyODQwNn0.hZUbB2SBZlcRNBT05lktIW_fIcmi-qpSi3jolwsqwT0';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── Farm config ─────────────────────────────────────────────────
 const FARMS = {
-  khushnoor: { name:'Khushnoor Poultry Farm', sheds: Array.from({length:6}, (_,i)=>'Shed '+(i+1)) },
+  khushnoor: { name:'Khushnoor Poultry Farm', sheds: Array.from({length:6},(_,i)=>'Shed '+(i+1)) },
   qazi:      { name:'Qazi Poultry Farm',      sheds: Array.from({length:12},(_,i)=>'Shed '+(i+1)) }
 };
+const FEED_TYPES = ['Chick Starter','Grower','Layer Young','Layer Molting'];
+const BAGS_TO_KG = 50;
+const TRAY_EGGS = 30;
+const PETI_TRAYS = 12;
+const PETI_EGGS = PETI_TRAYS * TRAY_EGGS; // 360
 
 let cache = { khushnoor:[], qazi:[] };
+let flockSetups = {}; // key: farm_shed
 let selectedShed = { khushnoor:null, qazi:null };
+let medicineRows = { khushnoor:[], qazi:[] };
 
-// ── Helpers ─────────────────────────────────────────────────────
 function today(){ return new Date().toISOString().split('T')[0]; }
 function fmt(d){ return new Date(d+'T00:00:00').toLocaleDateString('en-PK',{day:'2-digit',month:'short',year:'numeric'}); }
-function showToast(msg, type='success'){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast '+type; t.style.display='block';
-  setTimeout(()=>t.style.display='none', 2800);
-}
-function setDbStatus(state){
-  const el=document.getElementById('db-status');
-  if(state==='connected'){ el.textContent='🟢 Cloud connected'; el.className='db-status connected'; }
-  else if(state==='error'){ el.textContent='🔴 Offline'; el.className='db-status disconnected'; }
-  else { el.textContent='⏳ Connecting...'; el.className='db-status loading'; }
-}
+function showToast(msg,type='success'){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast '+type; t.style.display='block'; setTimeout(()=>t.style.display='none',2800); }
+function setDbStatus(s){ const el=document.getElementById('db-status'); if(s==='connected'){el.textContent='🟢 Cloud connected';el.className='db-status connected';}else if(s==='error'){el.textContent='🔴 Offline';el.className='db-status disconnected';}else{el.textContent='⏳ Connecting...';el.className='db-status loading';} }
+function flockKey(farm,shed){ return farm+'_'+shed.replace(' ',''); }
+function weeksSince(dateStr){ if(!dateStr) return 0; const ms=new Date(today())-new Date(dateStr); return Math.floor(ms/(7*24*3600*1000)); }
+function daysSince(dateStr){ if(!dateStr) return 0; return Math.floor((new Date(today())-new Date(dateStr))/(24*3600*1000)); }
 
-// ── Load data from Supabase ─────────────────────────────────────
+// ── Supabase load ────────────────────────────────────────────────
 async function loadAll(){
   try {
-    const { data, error } = await sb.from('shed_records').select('*').order('date', {ascending:false});
-    if(error) throw error;
-    cache.khushnoor = data.filter(r=>r.farm==='khushnoor');
-    cache.qazi      = data.filter(r=>r.farm==='qazi');
+    const [recRes, setupRes] = await Promise.all([
+      sb.from('shed_records').select('*').order('date',{ascending:false}),
+      sb.from('flock_setup').select('*')
+    ]);
+    if(recRes.error) throw recRes.error;
+    cache.khushnoor = recRes.data.filter(r=>r.farm==='khushnoor');
+    cache.qazi      = recRes.data.filter(r=>r.farm==='qazi');
+    if(setupRes.data) setupRes.data.forEach(s=>{ flockSetups[flockKey(s.farm,s.shed)]=s; });
     setDbStatus('connected');
     renderShedGrid('khushnoor');
     renderShedGrid('qazi');
-  } catch(e){
-    setDbStatus('error');
-    showToast('Could not connect to database. Check your internet.', 'error');
-  }
+  } catch(e){ setDbStatus('error'); showToast('Could not connect to database.','error'); }
 }
 
-// ── Switch farm/tab ─────────────────────────────────────────────
-function switchFarm(farm, el){
+// ── Navigation ───────────────────────────────────────────────────
+function switchFarm(farm,el){
   document.querySelectorAll('.farm-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
   document.querySelectorAll('.farm-section').forEach(s=>s.style.display='none');
   document.getElementById('farm-'+farm).style.display='block';
   if(farm==='combined') renderCombined();
 }
-function switchTab(farm, tab, el){
+function switchTab(farm,tab,el){
   el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  ['entry','records','summary'].forEach(t=>{ const e=document.getElementById(farm+'-'+t); if(e) e.classList.remove('active'); });
+  ['entry','records','kpis','summary'].forEach(t=>{ const e=document.getElementById(farm+'-'+t); if(e) e.classList.remove('active'); });
   document.getElementById(farm+'-'+tab).classList.add('active');
   if(tab==='records') renderRecords(farm);
   if(tab==='summary') renderSummary(farm);
+  if(tab==='kpis') renderKPIs(farm);
 }
-
-// ── Shed filter dropdowns ───────────────────────────────────────
 function initFilters(){
   Object.keys(FARMS).forEach(farm=>{
     const opts=FARMS[farm].sheds.map(s=>`<option value="${s}">${s}</option>`).join('');
@@ -308,72 +298,313 @@ function initFilters(){
   });
 }
 
-// ── Shed grid ───────────────────────────────────────────────────
+// ── Shed grid ────────────────────────────────────────────────────
 function renderShedGrid(farm){
   document.getElementById('shed-grid-'+farm).innerHTML = FARMS[farm].sheds.map(shed=>{
+    const key=flockKey(farm,shed);
+    const setup=flockSetups[key];
     const rec=cache[farm].find(r=>r.shed===shed&&r.date===today());
-    return `<button class="shed-btn ${selectedShed[farm]===shed?'selected':''}" onclick="selectShed('${farm}','${shed}')">
+    const hasSetup=!!setup;
+    return `<button class="shed-btn ${!hasSetup?'not-setup':''} ${selectedShed[farm]===shed?'selected':''}" onclick="selectShed('${farm}','${shed}')">
+      ${!hasSetup?'<span class="setup-badge">Setup needed</span>':''}
       <div class="shed-name">🏠 ${shed}</div>
-      <div class="shed-count">${rec?rec.eggs+' eggs · '+rec.birds+' birds':'No entry today'}</div>
-      <span class="shed-status ${rec?'status-done':'status-pending'}">${rec?'✓ Recorded':'⏳ Pending'}</span>
+      <div class="shed-birds">${hasSetup?setup.opening_birds+' birds · '+setup.bird_type:'Not configured'}</div>
+      <span class="shed-status ${rec?'status-done':hasSetup?'status-pending':'status-setup'}">${rec?'✓ Recorded':hasSetup?'⏳ Pending':'⚙️ Setup first'}</span>
     </button>`;
   }).join('');
 }
 
-function selectShed(farm, shed){
+// ── Select shed → show setup or entry form ───────────────────────
+function selectShed(farm,shed){
   selectedShed[farm]=shed;
   renderShedGrid(farm);
-  const ex=cache[farm].find(r=>r.shed===shed&&r.date===today());
-  document.getElementById('shed-title-'+farm).textContent=shed+' — Daily Entry';
-  document.getElementById('date-'+farm).value=today();
-  document.getElementById(farm+'-eggs').value=ex?ex.eggs:'';
-  document.getElementById(farm+'-broken').value=ex?ex.broken:'';
-  document.getElementById(farm+'-birds').value=ex?ex.birds:'';
-  document.getElementById(farm+'-mortality').value=ex?ex.mortality:'';
-  document.getElementById(farm+'-feed').value=ex?ex.feed:'';
-  document.getElementById(farm+'-medicine').value=ex?ex.medicine:'';
-  document.getElementById(farm+'-notes').value=ex?ex.notes:'';
+  const key=flockKey(farm,shed);
+  const setup=flockSetups[key];
+  if(!setup){ renderSetupForm(farm,shed); }
+  else { renderEntryForm(farm,shed,setup); }
   const f=document.getElementById('entry-form-'+farm);
   f.style.display='block';
   f.scrollIntoView({behavior:'smooth',block:'start'});
 }
 
+// ── Flock setup form ─────────────────────────────────────────────
+function renderSetupForm(farm,shed){
+  const f=document.getElementById('entry-form-'+farm);
+  f.innerHTML=`<div class="form-card">
+    <div class="form-title">⚙️ Setup: ${shed} — Flock Details <span style="font-size:12px;color:#888;font-weight:400;">(one-time setup)</span></div>
+    <div class="info-banner">📌 Fill this out once before starting daily records. You can edit it later anytime.</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Shed label (optional)</label><input type="text" id="setup-label-${farm}" placeholder="e.g. Shed 1 — Layers"></div>
+      <div class="form-group"><label>Bird type</label>
+        <select id="setup-birdtype-${farm}">
+          <option value="Layers">Layers (egg-laying)</option>
+          <option value="Broilers">Broilers (meat)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Opening bird count</label><input type="number" id="setup-birds-${farm}" placeholder="e.g. 10000" min="1"></div>
+      <div class="form-group"><label>Flock start date</label><input type="date" id="setup-startdate-${farm}"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" id="setup-save-${farm}" onclick="saveSetup('${farm}','${shed}')">✓ Save & Start Recording</button>
+      <button class="btn-secondary" onclick="closeForm('${farm}')">✕ Cancel</button>
+    </div>
+  </div>`;
+}
+
+async function saveSetup(farm,shed){
+  const label=document.getElementById('setup-label-'+farm).value.trim();
+  const birdType=document.getElementById('setup-birdtype-'+farm).value;
+  const birds=parseInt(document.getElementById('setup-birds-'+farm).value)||0;
+  const startDate=document.getElementById('setup-startdate-'+farm).value;
+  if(!birds||!startDate){showToast('Please fill opening bird count and start date','error');return;}
+  const btn=document.getElementById('setup-save-'+farm);
+  btn.disabled=true; btn.textContent='Saving...';
+  const rec={ farm, shed, bird_type:birdType, opening_birds:birds, start_date:startDate, label:label||shed };
+  try {
+    const {error}=await sb.from('flock_setup').upsert(rec,{onConflict:'farm,shed'});
+    if(error) throw error;
+    flockSetups[flockKey(farm,shed)]=rec;
+    showToast('✓ Shed setup saved! You can now record daily data.');
+    renderShedGrid(farm);
+    renderEntryForm(farm,shed,rec);
+  } catch(e){ showToast('Failed to save setup.','error'); btn.disabled=false; btn.textContent='✓ Save & Start Recording'; }
+}
+
+// ── Daily entry form ─────────────────────────────────────────────
+function renderEntryForm(farm,shed,setup){
+  const ex=cache[farm].find(r=>r.shed===shed&&r.date===today());
+  const meds=ex&&ex.medicine?JSON.parse(ex.medicine):[''];
+  medicineRows[farm]=meds;
+  const currentBirds=getCurrentBirds(farm,shed,setup);
+  const flockAge=weeksSince(setup.start_date);
+  const f=document.getElementById('entry-form-'+farm);
+  f.innerHTML=`<div class="flock-info-bar">
+    🐔 Opening flock: <span>${setup.opening_birds.toLocaleString()}</span> &nbsp;|&nbsp;
+    📅 Flock age: <span>${flockAge} weeks</span> &nbsp;|&nbsp;
+    🏷️ Type: <span>${setup.bird_type}</span> &nbsp;|&nbsp;
+    🐦 Current birds (est.): <span>${currentBirds.toLocaleString()}</span>
+    <button class="btn-sm" onclick="renderSetupForm('${farm}','${shed}'); document.getElementById('entry-form-${farm}').style.display='block';" style="margin-left:auto;">⚙️ Edit Setup</button>
+  </div>
+  <div class="form-card">
+    <div class="form-title">📋 ${shed} — Daily Entry</div>
+    <div class="form-group" style="max-width:200px;margin-bottom:1rem;"><label>Date</label><input type="date" id="date-${farm}" value="${today()}"></div>
+    <hr class="divider">
+
+    <div class="form-section">🥚 Egg Production</div>
+    <div class="form-grid-3">
+      <div class="form-group"><label>Petis (1 peti = 360 eggs)</label><input type="number" id="${farm}-petis" placeholder="0" min="0" value="${ex?ex.petis:''}" oninput="calcEggs('${farm}')"></div>
+      <div class="form-group"><label>Trays (1 tray = 30 eggs)</label><input type="number" id="${farm}-trays" placeholder="0" min="0" value="${ex?ex.trays:''}" oninput="calcEggs('${farm}')"></div>
+      <div class="form-group"><label>Extra eggs (loose)</label><input type="number" id="${farm}-loose" placeholder="0" min="0" value="${ex?ex.loose_eggs:''}" oninput="calcEggs('${farm}')"></div>
+    </div>
+    <div class="form-grid-3" style="margin-top:10px;">
+      <div class="form-group"><label>Total eggs (auto)</label><div class="calc-display" id="${farm}-total-eggs">0</div></div>
+      <div class="form-group"><label>Broken eggs</label><input type="number" id="${farm}-broken" placeholder="0" min="0" value="${ex?ex.broken:''}"></div>
+      <div class="form-group"><label>Saleable eggs (auto)</label><div class="calc-display" id="${farm}-saleable-eggs">0</div></div>
+    </div>
+
+    <div class="form-section">🌾 Feed</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Feed type</label>
+        <select id="${farm}-feedtype">
+          ${FEED_TYPES.map(f=>`<option value="${f}" ${ex&&ex.feed_type===f?'selected':''}>${f}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><label>Full bags used</label><input type="number" id="${farm}-fullbags" placeholder="0" min="0" value="${ex?ex.full_bags:''}" oninput="calcFeed('${farm}')"></div>
+      <div class="form-group"><label>Half bags used</label><input type="number" id="${farm}-halfbags" placeholder="0" min="0" value="${ex?ex.half_bags:''}" oninput="calcFeed('${farm}')"></div>
+      <div class="form-group"><label>Total feed kg (auto)</label><div class="calc-display" id="${farm}-total-feed">0</div></div>
+    </div>
+
+    <div class="form-section">🐔 Flock Movement</div>
+    <div class="form-grid">
+      <div class="form-group"><label>💀 Deaths today</label><input type="number" id="${farm}-mortality" placeholder="0" min="0" value="${ex?ex.mortality:''}"></div>
+      <div class="form-group"><label>➕ Birds added today</label><input type="number" id="${farm}-added" placeholder="0" min="0" value="${ex?ex.birds_added:''}"></div>
+      <div class="form-group"><label>➖ Birds removed today</label><input type="number" id="${farm}-removed" placeholder="0" min="0" value="${ex?ex.birds_removed:''}"></div>
+    </div>
+
+    <div class="form-section">💊 Medicine & Vaccines</div>
+    <div class="medicine-list" id="medicine-list-${farm}"></div>
+    <button class="btn-sm green" onclick="addMedicineRow('${farm}')">+ Add medicine / vaccine</button>
+
+    <div class="form-section">📝 Notes</div>
+    <div class="form-group"><input type="text" id="${farm}-notes" placeholder="Any observations for today..." value="${ex?ex.notes:''}"></div>
+
+    <div class="btn-row">
+      <button class="btn-primary" id="save-btn-${farm}" onclick="saveEntry('${farm}','${shed}')">✓ Save Record</button>
+      <button class="btn-secondary" onclick="closeForm('${farm}')">✕ Cancel</button>
+    </div>
+  </div>`;
+  renderMedicineList(farm);
+  calcEggs(farm);
+  calcFeed(farm);
+  if(ex){ setTimeout(()=>{calcEggs(farm);calcFeed(farm);},50); }
+}
+
+function calcEggs(farm){
+  const petis=parseInt(document.getElementById(farm+'-petis')?.value)||0;
+  const trays=parseInt(document.getElementById(farm+'-trays')?.value)||0;
+  const loose=parseInt(document.getElementById(farm+'-loose')?.value)||0;
+  const total=(petis*PETI_EGGS)+(trays*TRAY_EGGS)+loose;
+  const broken=parseInt(document.getElementById(farm+'-broken')?.value)||0;
+  const tel=document.getElementById(farm+'-total-eggs');
+  const sel=document.getElementById(farm+'-saleable-eggs');
+  if(tel) tel.textContent=total.toLocaleString();
+  if(sel) sel.textContent=Math.max(0,total-broken).toLocaleString();
+}
+function calcFeed(farm){
+  const full=parseInt(document.getElementById(farm+'-fullbags')?.value)||0;
+  const half=parseInt(document.getElementById(farm+'-halfbags')?.value)||0;
+  const kg=(full*BAGS_TO_KG)+(half*(BAGS_TO_KG/2));
+  const el=document.getElementById(farm+'-total-feed');
+  if(el) el.textContent=kg+' kg';
+}
+
+function renderMedicineList(farm){
+  const list=document.getElementById('medicine-list-'+farm);
+  if(!list) return;
+  list.innerHTML=medicineRows[farm].map((m,i)=>`<div class="medicine-item">
+    <input type="text" placeholder="e.g. ND Vaccine, Vitamin C injection, Dewormer..." value="${m}" onchange="medicineRows['${farm}'][${i}]=this.value">
+    <button onclick="removeMedicineRow('${farm}',${i})">✕</button>
+  </div>`).join('');
+}
+function addMedicineRow(farm){ medicineRows[farm].push(''); renderMedicineList(farm); }
+function removeMedicineRow(farm,i){ medicineRows[farm].splice(i,1); if(!medicineRows[farm].length) medicineRows[farm]=[''); renderMedicineList(farm); }
+
 function closeForm(farm){
   selectedShed[farm]=null;
   document.getElementById('entry-form-'+farm).style.display='none';
+  document.getElementById('entry-form-'+farm).innerHTML='';
   renderShedGrid(farm);
 }
 
-// ── Save entry to Supabase ──────────────────────────────────────
-async function saveEntry(farm){
+// ── Save daily entry ─────────────────────────────────────────────
+async function saveEntry(farm,shed){
   const date=document.getElementById('date-'+farm).value;
   if(!date){showToast('Please select a date','error');return;}
+  const petis=parseInt(document.getElementById(farm+'-petis').value)||0;
+  const trays=parseInt(document.getElementById(farm+'-trays').value)||0;
+  const loose=parseInt(document.getElementById(farm+'-loose').value)||0;
+  const totalEggs=(petis*PETI_EGGS)+(trays*TRAY_EGGS)+loose;
+  const broken=parseInt(document.getElementById(farm+'-broken').value)||0;
+  const fullBags=parseInt(document.getElementById(farm+'-fullbags').value)||0;
+  const halfBags=parseInt(document.getElementById(farm+'-halfbags').value)||0;
+  const feedKg=(fullBags*BAGS_TO_KG)+(halfBags*(BAGS_TO_KG/2));
+  const meds=medicineRows[farm].filter(m=>m.trim());
   const btn=document.getElementById('save-btn-'+farm);
   btn.disabled=true; btn.textContent='Saving...';
   const rec={
-    farm, shed:selectedShed[farm], date,
-    eggs:parseInt(document.getElementById(farm+'-eggs').value)||0,
-    broken:parseInt(document.getElementById(farm+'-broken').value)||0,
-    birds:parseInt(document.getElementById(farm+'-birds').value)||0,
+    farm, shed, date,
+    petis, trays, loose_eggs:loose,
+    eggs:totalEggs, broken,
+    feed_type:document.getElementById(farm+'-feedtype').value,
+    full_bags:fullBags, half_bags:halfBags, feed:feedKg,
     mortality:parseInt(document.getElementById(farm+'-mortality').value)||0,
-    feed:parseFloat(document.getElementById(farm+'-feed').value)||0,
-    medicine:document.getElementById(farm+'-medicine').value.trim(),
+    birds_added:parseInt(document.getElementById(farm+'-added').value)||0,
+    birds_removed:parseInt(document.getElementById(farm+'-removed').value)||0,
+    medicine:JSON.stringify(meds),
     notes:document.getElementById(farm+'-notes').value.trim()
   };
   try {
-    const { error } = await sb.from('shed_records').upsert(rec, { onConflict:'farm,shed,date' });
+    const {error}=await sb.from('shed_records').upsert(rec,{onConflict:'farm,shed,date'});
     if(error) throw error;
-    showToast('✓ Record saved for '+selectedShed[farm]);
+    showToast('✓ Record saved for '+shed);
     await loadAll();
     closeForm(farm);
-  } catch(e){
-    showToast('Failed to save. Check your connection.','error');
-  } finally {
-    btn.disabled=false; btn.textContent='✓ Save Record';
-  }
+  } catch(e){ showToast('Failed to save. Check connection.','error'); btn.disabled=false; btn.textContent='✓ Save Record'; }
 }
 
-// ── Records table ───────────────────────────────────────────────
+// ── Current birds calculator ─────────────────────────────────────
+function getCurrentBirds(farm,shed,setup){
+  if(!setup) return 0;
+  const shedRecs=cache[farm].filter(r=>r.shed===shed);
+  const totalDeaths=shedRecs.reduce((s,r)=>s+(r.mortality||0),0);
+  const totalAdded=shedRecs.reduce((s,r)=>s+(r.birds_added||0),0);
+  const totalRemoved=shedRecs.reduce((s,r)=>s+(r.birds_removed||0),0);
+  return Math.max(0,setup.opening_birds+totalAdded-totalRemoved-totalDeaths);
+}
+
+// ── KPI calculations ─────────────────────────────────────────────
+function calcKPIs(farm,shed){
+  const setup=flockSetups[flockKey(farm,shed)];
+  if(!setup) return null;
+  const recs=cache[farm].filter(r=>r.shed===shed).sort((a,b)=>a.date.localeCompare(b.date));
+  if(!recs.length) return null;
+  const todayRec=recs.find(r=>r.date===today());
+  const totalEggs=recs.reduce((s,r)=>s+(r.eggs||0),0);
+  const totalBroken=recs.reduce((s,r)=>s+(r.broken||0),0);
+  const totalFeedKg=recs.reduce((s,r)=>s+(r.feed||0),0);
+  const totalDeaths=recs.reduce((s,r)=>s+(r.mortality||0),0);
+  const totalAdded=recs.reduce((s,r)=>s+(r.birds_added||0),0);
+  const totalRemoved=recs.reduce((s,r)=>s+(r.birds_removed||0),0);
+  const currentBirds=Math.max(0,setup.opening_birds+totalAdded-totalRemoved-totalDeaths);
+  const netEggs=totalEggs-totalBroken;
+  const flockAgeDays=daysSince(setup.start_date);
+  const flockAgeWeeks=weeksSince(setup.start_date);
+  const hdp=currentBirds>0&&todayRec?((todayRec.eggs/currentBirds)*100).toFixed(1):null;
+  const hhp=setup.opening_birds>0?((totalEggs/(setup.opening_birds*Math.max(1,flockAgeDays)))*100).toFixed(1):null;
+  const fcr=netEggs>0?(totalFeedKg/netEggs).toFixed(3):null;
+  const feedPerBird=currentBirds>0&&todayRec?((todayRec.feed/currentBirds)*1000).toFixed(1):null;
+  const cumMortPct=setup.opening_birds>0?((totalDeaths/setup.opening_birds)*100).toFixed(2):null;
+  const dailyMortPct=currentBirds>0&&todayRec?((todayRec.mortality/currentBirds)*100).toFixed(3):null;
+  const viability=setup.opening_birds>0?((currentBirds/setup.opening_birds)*100).toFixed(1):null;
+  return { hdp, hhp, fcr, feedPerBird, cumMortPct, dailyMortPct, viability, currentBirds, totalDeaths, totalEggs, netEggs, totalFeedKg, flockAgeWeeks, openingBirds:setup.opening_birds, todayEggs:todayRec?.eggs||0 };
+}
+
+function renderKPIs(farm){
+  const container=document.getElementById('kpis-'+farm);
+  const sheds=FARMS[farm].sheds.filter(s=>flockSetups[flockKey(farm,s)]);
+  if(!sheds.length){ container.innerHTML='<div class="empty-state"><div style="font-size:36px;margin-bottom:8px;">⚙️</div>Set up your sheds first to see KPIs</div>'; return; }
+  container.innerHTML=sheds.map(shed=>{
+    const k=calcKPIs(farm,shed);
+    if(!k) return `<div class="form-card" style="margin-bottom:1rem;"><div style="font-weight:600;margin-bottom:0.5rem;">🏠 ${shed}</div><div style="color:#aaa;font-size:13px;">No daily records yet.</div></div>`;
+    return `<div class="form-card" style="margin-bottom:1.25rem;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px;">🏠 ${shed} <span style="font-size:12px;font-weight:400;color:#888;">· ${k.flockAgeWeeks} weeks old · ${k.currentBirds.toLocaleString()} birds</span></div>
+      <div class="kpi-grid">
+        <div class="kpi-card ${k.hdp&&k.hdp>=70?'green':k.hdp&&k.hdp>=50?'amber':'red'}">
+          <div class="kpi-label">HDP% (today)</div>
+          <div class="kpi-value">${k.hdp?k.hdp+'%':'—'}</div>
+          <div class="kpi-sub">Hen Day Production</div>
+        </div>
+        <div class="kpi-card ${k.hhp&&k.hhp>=60?'green':k.hhp&&k.hhp>=40?'amber':'red'}">
+          <div class="kpi-label">HHP%</div>
+          <div class="kpi-value">${k.hhp?k.hhp+'%':'—'}</div>
+          <div class="kpi-sub">Hen Housed Production</div>
+        </div>
+        <div class="kpi-card ${k.fcr&&k.fcr<=2.2?'green':k.fcr&&k.fcr<=2.8?'amber':'red'}">
+          <div class="kpi-label">FCR</div>
+          <div class="kpi-value">${k.fcr||'—'}</div>
+          <div class="kpi-sub">Feed per egg (kg)</div>
+        </div>
+        <div class="kpi-card ${k.feedPerBird&&k.feedPerBird<=120?'green':k.feedPerBird&&k.feedPerBird<=140?'amber':'red'}">
+          <div class="kpi-label">Feed/bird/day</div>
+          <div class="kpi-value">${k.feedPerBird?k.feedPerBird+'g':'—'}</div>
+          <div class="kpi-sub">Today's consumption</div>
+        </div>
+        <div class="kpi-card ${k.dailyMortPct&&k.dailyMortPct<=0.05?'green':k.dailyMortPct&&k.dailyMortPct<=0.1?'amber':'red'}">
+          <div class="kpi-label">Daily mortality%</div>
+          <div class="kpi-value">${k.dailyMortPct?k.dailyMortPct+'%':'—'}</div>
+          <div class="kpi-sub">Today's deaths</div>
+        </div>
+        <div class="kpi-card ${k.cumMortPct&&k.cumMortPct<=5?'green':k.cumMortPct&&k.cumMortPct<=10?'amber':'red'}">
+          <div class="kpi-label">Cumulative mort%</div>
+          <div class="kpi-value">${k.cumMortPct?k.cumMortPct+'%':'—'}</div>
+          <div class="kpi-sub">${k.totalDeaths} total deaths</div>
+        </div>
+        <div class="kpi-card ${k.viability&&k.viability>=95?'green':k.viability&&k.viability>=90?'amber':'red'}">
+          <div class="kpi-label">Viability%</div>
+          <div class="kpi-value">${k.viability?k.viability+'%':'—'}</div>
+          <div class="kpi-sub">Flock alive vs opening</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Net eggs (total)</div>
+          <div class="kpi-value">${k.netEggs.toLocaleString()}</div>
+          <div class="kpi-sub">Saleable this cycle</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Records table ────────────────────────────────────────────────
 function renderRecords(farm){
   const shed=document.getElementById('filter-shed-'+farm).value;
   const date=document.getElementById('filter-date-'+farm).value;
@@ -384,46 +615,46 @@ function renderRecords(farm){
   const c=document.getElementById('records-'+farm);
   if(!data.length){c.innerHTML='<div class="empty-state"><div style="font-size:36px;margin-bottom:8px;">📭</div>No records found</div>';return;}
   c.innerHTML=`<table class="records-table">
-    <thead><tr><th>Date</th><th>Shed</th><th>Eggs</th><th>Broken</th><th>Birds</th><th>Deaths</th><th>Feed(kg)</th><th>Medicine</th></tr></thead>
+    <thead><tr><th>Date</th><th>Shed</th><th>Eggs</th><th>Broken</th><th>Feed type</th><th>Feed(kg)</th><th>Deaths</th><th>Added</th><th>Removed</th><th>Medicine</th></tr></thead>
     <tbody>${data.map(r=>`<tr>
-      <td>${fmt(r.date)}</td><td><span class="badge badge-green">${r.shed}</span></td>
-      <td><strong>${r.eggs}</strong></td>
+      <td>${fmt(r.date)}</td>
+      <td><span class="badge badge-green">${r.shed}</span></td>
+      <td><strong>${(r.eggs||0).toLocaleString()}</strong></td>
       <td>${r.broken>0?`<span class="badge badge-amber">${r.broken}</span>`:'0'}</td>
-      <td>${r.birds}</td>
+      <td style="font-size:12px;">${r.feed_type||'—'}</td>
+      <td>${r.feed||0}</td>
       <td>${r.mortality>0?`<span class="badge badge-red">${r.mortality}</span>`:'0'}</td>
-      <td>${r.feed}</td><td style="font-size:12px;color:#666;">${r.medicine||'—'}</td>
+      <td>${r.birds_added>0?`<span style="color:#27500A;font-weight:600;">+${r.birds_added}</span>`:'—'}</td>
+      <td>${r.birds_removed>0?`<span style="color:#856404;font-weight:600;">-${r.birds_removed}</span>`:'—'}</td>
+      <td style="font-size:11px;color:#666;max-width:140px;">${r.medicine?JSON.parse(r.medicine).filter(Boolean).join(', ')||'—':'—'}</td>
     </tr>`).join('')}</tbody></table>`;
 }
+function clearFilters(farm){ document.getElementById('filter-shed-'+farm).value='all'; document.getElementById('filter-date-'+farm).value=''; renderRecords(farm); }
 
-function clearFilters(farm){
-  document.getElementById('filter-shed-'+farm).value='all';
-  document.getElementById('filter-date-'+farm).value='';
-  renderRecords(farm);
-}
-
-// ── Summary ─────────────────────────────────────────────────────
+// ── Summary ──────────────────────────────────────────────────────
 function getFiltered(farm,period,shed){
   let data=[...cache[farm]];
   if(shed!=='all') data=data.filter(r=>r.shed===shed);
-  const t=today(); const now=new Date();
+  const t=today(),now=new Date();
   if(period==='today') data=data.filter(r=>r.date===t);
   else if(period==='week'){const s=new Date(now);s.setDate(now.getDate()-6);data=data.filter(r=>r.date>=s.toISOString().split('T')[0]);}
   else if(period==='month'){const s=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];data=data.filter(r=>r.date>=s);}
   return data;
 }
-
 function metricCards(data){
-  const te=data.reduce((s,r)=>s+r.eggs,0),tb=data.reduce((s,r)=>s+r.broken,0),net=te-tb;
+  const te=data.reduce((s,r)=>s+(r.eggs||0),0),tb=data.reduce((s,r)=>s+(r.broken||0),0),net=te-tb;
+  const tf=data.reduce((s,r)=>s+(r.feed||0),0);
   const yr=te?Math.round((net/te)*100):0;
+  const fcr=net>0?(tf/net).toFixed(3):'—';
   return `
-    <div class="metric-card highlight"><div class="metric-label">Net eggs</div><div class="metric-value">${net.toLocaleString()}</div><div class="metric-sub">after breakage</div></div>
-    <div class="metric-card"><div class="metric-label">Total collected</div><div class="metric-value">${te.toLocaleString()}</div><div class="metric-sub">eggs</div></div>
-    <div class="metric-card"><div class="metric-label">Broken</div><div class="metric-value">${tb}</div><div class="metric-sub">${yr}% yield</div></div>
-    <div class="metric-card"><div class="metric-label">Mortality</div><div class="metric-value">${data.reduce((s,r)=>s+r.mortality,0)}</div><div class="metric-sub">total deaths</div></div>
-    <div class="metric-card"><div class="metric-label">Feed used</div><div class="metric-value">${data.reduce((s,r)=>s+r.feed,0).toFixed(1)}</div><div class="metric-sub">kg total</div></div>
-    <div class="metric-card"><div class="metric-label">Records</div><div class="metric-value">${data.length}</div><div class="metric-sub">entries logged</div></div>`;
+    <div class="metric-card highlight"><div class="metric-label">Net eggs</div><div class="metric-value">${net.toLocaleString()}</div><div class="metric-sub">saleable</div></div>
+    <div class="metric-card"><div class="metric-label">Total collected</div><div class="metric-value">${te.toLocaleString()}</div><div class="metric-sub">${yr}% yield</div></div>
+    <div class="metric-card"><div class="metric-label">Broken</div><div class="metric-value">${tb}</div><div class="metric-sub">eggs lost</div></div>
+    <div class="metric-card"><div class="metric-label">Mortality</div><div class="metric-value">${data.reduce((s,r)=>s+(r.mortality||0),0)}</div><div class="metric-sub">deaths</div></div>
+    <div class="metric-card"><div class="metric-label">Feed used</div><div class="metric-value">${tf.toFixed(1)}</div><div class="metric-sub">kg total</div></div>
+    <div class="metric-card"><div class="metric-label">FCR</div><div class="metric-value">${fcr}</div><div class="metric-sub">feed per egg</div></div>
+    <div class="metric-card"><div class="metric-label">Records</div><div class="metric-value">${data.length}</div><div class="metric-sub">entries</div></div>`;
 }
-
 function renderSummary(farm){
   const period=document.getElementById('sum-period-'+farm).value;
   const shed=document.getElementById('sum-shed-'+farm).value;
@@ -432,35 +663,39 @@ function renderSummary(farm){
   const bd=document.getElementById('breakdown-'+farm);
   const shedData=FARMS[farm].sheds.map(s=>{
     const d=data.filter(r=>r.shed===s);
-    return{shed:s,eggs:d.reduce((x,r)=>x+r.eggs,0),broken:d.reduce((x,r)=>x+r.broken,0),deaths:d.reduce((x,r)=>x+r.mortality,0),feed:d.reduce((x,r)=>x+r.feed,0),entries:d.length};
+    return{shed:s,eggs:d.reduce((x,r)=>x+(r.eggs||0),0),broken:d.reduce((x,r)=>x+(r.broken||0),0),deaths:d.reduce((x,r)=>x+(r.mortality||0),0),feed:d.reduce((x,r)=>x+(r.feed||0),0),entries:d.length};
   }).filter(s=>s.entries>0);
   if(!shedData.length){bd.innerHTML='<div style="color:#aaa;font-size:13px;padding:0.5rem;">No data for selected period.</div>';return;}
   bd.innerHTML=shedData.map(s=>`<div class="shed-breakdown-card">
     <div class="shed-title">🏠 ${s.shed}</div>
     <div class="row"><span>Eggs collected</span><span>${s.eggs.toLocaleString()}</span></div>
     <div class="row"><span>Broken eggs</span><span>${s.broken}</span></div>
+    <div class="row"><span>Net (saleable)</span><span>${(s.eggs-s.broken).toLocaleString()}</span></div>
     <div class="row"><span>Deaths</span><span>${s.deaths}</span></div>
     <div class="row"><span>Feed consumed</span><span>${s.feed.toFixed(1)} kg</span></div>
+    <div class="row"><span>FCR</span><span>${(s.eggs-s.broken)>0?(s.feed/(s.eggs-s.broken)).toFixed(3):'—'}</span></div>
     <div class="row"><span>Entries logged</span><span>${s.entries}</span></div>
   </div>`).join('');
 }
 
+// ── Combined ─────────────────────────────────────────────────────
 function renderCombined(){
   const period=document.getElementById('combined-period').value;
   const kd=getFiltered('khushnoor',period,'all'),qd=getFiltered('qazi',period,'all'),all=[...kd,...qd];
-  const te=all.reduce((s,r)=>s+r.eggs,0),tb=all.reduce((s,r)=>s+r.broken,0);
+  const te=all.reduce((s,r)=>s+(r.eggs||0),0),tb=all.reduce((s,r)=>s+(r.broken||0),0),net=te-tb;
+  const tf=all.reduce((s,r)=>s+(r.feed||0),0);
   document.getElementById('combined-stats').innerHTML=`
-    <div class="combined-stat"><div class="val">${(te-tb).toLocaleString()}</div><div class="lbl">Net eggs</div></div>
+    <div class="combined-stat"><div class="val">${net.toLocaleString()}</div><div class="lbl">Net eggs</div></div>
     <div class="combined-stat"><div class="val">${te.toLocaleString()}</div><div class="lbl">Total collected</div></div>
     <div class="combined-stat"><div class="val">${tb}</div><div class="lbl">Broken</div></div>
-    <div class="combined-stat"><div class="val">${all.reduce((s,r)=>s+r.mortality,0)}</div><div class="lbl">Mortality</div></div>
-    <div class="combined-stat"><div class="val">${all.reduce((s,r)=>s+r.feed,0).toFixed(1)}</div><div class="lbl">Feed (kg)</div></div>
-    <div class="combined-stat"><div class="val">${all.length}</div><div class="lbl">Total entries</div></div>`;
+    <div class="combined-stat"><div class="val">${all.reduce((s,r)=>s+(r.mortality||0),0)}</div><div class="lbl">Mortality</div></div>
+    <div class="combined-stat"><div class="val">${tf.toFixed(1)}</div><div class="lbl">Feed (kg)</div></div>
+    <div class="combined-stat"><div class="val">${net>0?(tf/net).toFixed(3):'—'}</div><div class="lbl">FCR</div></div>`;
   document.getElementById('combined-khushnoor').innerHTML=metricCards(kd);
   document.getElementById('combined-qazi').innerHTML=metricCards(qd);
 }
 
-// ── Init ────────────────────────────────────────────────────────
+// ── Init ─────────────────────────────────────────────────────────
 document.getElementById('today-date').textContent=new Date().toLocaleDateString('en-PK',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 initFilters();
 loadAll();
