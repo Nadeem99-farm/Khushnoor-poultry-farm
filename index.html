@@ -467,7 +467,7 @@ function renderMedicineList(farm){
   </div>`).join('');
 }
 function addMedicineRow(farm){ medicineRows[farm].push(''); renderMedicineList(farm); }
-function removeMedicineRow(farm,i){ medicineRows[farm].splice(i,1); if(!medicineRows[farm].length) medicineRows[farm]=[''); renderMedicineList(farm); }
+function removeMedicineRow(farm,i){ medicineRows[farm].splice(i,1); if(!medicineRows[farm].length) medicineRows[farm]=['']; renderMedicineList(farm); }
 
 function closeForm(farm){
   selectedShed[farm]=null;
